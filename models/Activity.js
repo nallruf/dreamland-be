@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { ObjectId } = mongoose.Schema;
 
 const activitySchema = new mongoose.Schema({
     name: {
@@ -16,7 +17,12 @@ const activitySchema = new mongoose.Schema({
     imageUrl: {
         type: String,
         required: true
-    }
+    },
+
+    itemId: [{
+        type: ObjectId,
+        ref: 'Item'
+    }]
 
 })
 

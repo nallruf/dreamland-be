@@ -1,7 +1,10 @@
-const Category = require('../models/Category')
-const Bank = require('../models/Bank')
-const fs = require('fs-extra')
-const path = require('path')
+const Category = require('../models/Category');
+const Bank = require('../models/Bank');
+const Item = require('../models/Item');
+const Image = require('../models/Image');
+const fs = require('fs-extra');
+const path = require('path');
+const { error } = require('console');
 
 
 module.exports = {
@@ -172,11 +175,207 @@ module.exports = {
         }
     },
 
-    viewItem: (req, res) => {
-        res.render('admin/item/view_item', {
-            title: 'Dreamland | Item'
-        });
+    viewItem: async (req, res) => {
+        try {
+            const item = await Item.find()
+                .populate({ path: 'imageId', select: 'id imageUrl' })
+                .populate({ path: 'categoryId', select: 'id name' });
+
+            const ctg = await Category.find();
+            const alertMessage = req.flash('alertMessage');
+            const alertStatus = req.flash('alertStatus');
+            const alert = { message: alertMessage, status: alertStatus};
+            res.render('admin/item/view_item', {
+                title: 'Dreamland | Item',
+                ctg,
+                alert,
+                item,
+                action: 'view'
+            });
+        } catch (error) {
+            req.flash('alertMessage', `${error.message}`);
+            req.flash('alertStatus', 'danger');
+            res.redirect('/admin/item');
+            
+        }
     },
+
+    addItem: async (req, res) => {
+        try {
+            const {title, price, city, categoryId, desc} = req.body;
+            if (req.files.length > 0) {
+                const category = await Category.findOne({ _id : categoryId });
+                console.log(category)
+                const newItem= {
+                    categoryId,
+                    title,
+                    price,
+                    city,
+                    description: desc
+                }
+
+                const item = await Item.create(newItem);
+                console.log(item)
+                console.log(category.schema)
+
+
+                category.itemId.push({ _id: item._id});
+                await category.save();
+
+                
+                for (let i = 0; i < req.files.length; i++) {
+                    const imgSave = await Image.create({ imageUrl: `images/${req.files[i].filename}`});
+                    item.imageId.push({ _id : imgSave._id });
+                    await item.save();
+                }
+
+                req.flash('alertMessage', 'Success add item');
+                req.flash('alertStatus', 'success');
+                res.redirect('/admin/item')
+
+            }
+        } catch (error) {
+            req.flash('alertMessage', `${error.message}`);
+            req.flash('alertStatus', 'danger');
+            res.redirect('/admin/item');
+            
+        }
+    },
+
+    showImageItem: async (req, res) => {
+        try {
+            const  {id} = req.params;
+            const item = await Item.findOne({ _id: id})
+                .populate({ path: 'imageId', select: 'id imageUrl' });
+
+            const alertMessage = req.flash('alertMessage');
+            const alertStatus = req.flash('alertStatus');
+            const alert = { message: alertMessage, status: alertStatus};
+            res.render('admin/item/view_item', {
+                title: 'Dreamland | Show Image Item',
+                alert,
+                item,
+                action: 'show image'
+            });
+        } catch (error) {
+            req.flash('alertMessage', `${error.message}`);
+            req.flash('alertStatus', 'danger');
+            res.redirect('/admin/item');
+            
+        }
+    },
+
+    showEditItem: async (req, res) => {
+        try {
+            const  {id} = req.params;
+            const item = await Item.findOne({ _id: id})
+                .populate({ path: 'imageId', select: 'id imageUrl' })
+                .populate({ path: 'categoryId', select: 'id name' });;
+
+            const ctg = await Category.find();
+            const alertMessage = req.flash('alertMessage');
+            const alertStatus = req.flash('alertStatus');
+            const alert = { message: alertMessage, status: alertStatus};
+            res.render('admin/item/view_item', {
+                title: 'Dreamland | Edit Item',
+                alert,
+                item,
+                ctg,
+                action: 'edit'
+            });
+        } catch (error) {
+            req.flash('alertMessage', `${error.message}`);
+            req.flash('alertStatus', 'danger');
+            res.redirect('/admin/item');
+            
+        }
+    },
+
+    editItem: async (req, res) => {
+        try {
+            const {id} = req.params;
+            const {title, price, city, categoryId, desc} = req.body;
+
+            console.log(req.body)
+            const item = await Item.findOne({ _id: id})
+                .populate({ path: 'imageId', select: 'id imageUrl' })
+                .populate({ path: 'categoryId', select: 'id name' });;
+
+            if (req.files.length > 0) {
+                for (let i = 0; i < req.files.length; i++) {
+                    const imageUpdate = await Image.findOne({ _id : item.imageId[i]._id});
+                    await fs.unlink(path.join(`public/${imageUpdate.imageUrl}`));
+                    imageUpdate.imageUrl = `images/${req.files[i].filename}`;
+                    await imageUpdate.save();
+                }
+ 
+                item.title = title,
+                item.price = price,
+                item.description = desc,
+                item.city = city,
+                item.categoryId = categoryId
+                await item.save();
+
+                req.flash('alertMessage', 'Success update item');
+                req.flash('alertStatus', 'success');
+                res.redirect('/admin/item') 
+                
+            }else{
+                item.title = title,
+                item.price = price,
+                item.description = desc,
+                item.city = city,
+                item.categoryId = categoryId
+                await item.save();
+
+                req.flash('alertMessage', 'Success update item');
+                req.flash('alertStatus', 'success');
+                res.redirect('/admin/item')
+
+
+            }
+
+        } catch (error) {
+            req.flash('alertMessage', `${error.message}`);
+            req.flash('alertStatus', 'danger');
+            res.redirect('/admin/item');
+        }
+    },
+
+    deleteItem: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const item = await Item.findOne({ _id : id }).populate('imageId');
+
+            for (let i = 0; i < item.imageId.length; i++){
+                // Image.findOne({ _id: item.imageId[i].id}).then( async (image) => {
+                //     await fs.unlink(path.join(`public/${imageUpdate.imageUrl}`));
+                //     image.remove();
+                // }).catch((error) => {
+                //     req.flash('alertMessage', `${error.message}`);
+                //     req.flash('alertStatus', 'danger');
+                //     res.redirect('/admin/item');
+                // });        
+
+                const image = await Image.findOne({ _id: item.imageId[i].id });
+
+                await fs.unlink(path.join(`public/${image.imageUrl}`));
+                await image.deleteOne();
+            }
+
+            await item.deleteOne();
+            req.flash('alertMessage', 'Success delete item');
+            req.flash('alertStatus', 'success');
+            res.redirect('/admin/item')
+
+
+        } catch (error) {
+            req.flash('alertMessage', `${error.message}`);
+            req.flash('alertStatus', 'danger');
+            res.redirect('/admin/item');
+        }
+    },
+
 
     viewBooking: (req, res) => {
         res.render('admin/booking/view_booking', {

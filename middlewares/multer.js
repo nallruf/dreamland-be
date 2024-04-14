@@ -41,6 +41,7 @@ const upload = multer({
   }
 }).single("image");
 
+
 // // Check file Type
 function checkFileType(file, cb) {
 

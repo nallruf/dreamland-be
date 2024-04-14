@@ -6,10 +6,6 @@ const itemSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    place: {
-        type: String,
-        required: true
-    },
     country: {
         type: String,
         default: 'Indonesia'
@@ -20,24 +16,35 @@ const itemSchema = new mongoose.Schema({
     },
     isPopular: {
         type: Boolean, 
-        required: true
+        required: true,
+        default: false
     },
     description: {
         type: String,
         required: true
     },
-    imageId: {
+    price: {
+        type: String,
+        required: true
+    },
+
+    categoryId: {
+        type: ObjectId,
+        ref: 'Category'
+    },
+
+    imageId: [{
         type: ObjectId,
         ref: 'Image'
-    },
-    featureId: {
+    }],
+    featureId: [{
         type: ObjectId,
         ref: 'Feature'
-    },
-    activityId: {
+    }],
+    activityId: [{
         type: ObjectId,
         ref: 'Activity'
-    },
+    }],
 
 })
 

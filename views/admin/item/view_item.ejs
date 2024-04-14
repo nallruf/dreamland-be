@@ -19,11 +19,43 @@
       <!-- Begin Page Content -->
       <div class="container-fluid">
 
+        <%- include('../../partials/alert.ejs') -%>
         <!-- Page Heading -->
         <h1 class="h3 mb-4 text-gray-800">Item</h1>
         <!-- End Page Heading -->
-        <%- include('./table.ejs') -%>
 
+
+        <% if(action == 'view') { %>
+        <nav>
+          <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#show-item" role="tab" aria-controls="nav-home" aria-selected="true">Show item</a>
+            <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#add-item" role="tab" aria-controls="nav-profile" aria-selected="false">Add item</a>
+           
+          </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
+          <%- include('table.ejs') %>
+          <%- include('add_item.ejs') %>
+        </div>
+        <% }else if(action == 'show image') { %>
+          <nav>
+            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+              <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#show-image" role="tab" aria-controls="nav-home" aria-selected="true">Show image</a>             
+            </div>
+          </nav>
+          <div class="tab-content" id="nav-tabContent">
+            <%- include('show_image.ejs') %>
+          </div>
+          <% }else if(action == 'edit') { %>
+            <nav>
+              <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#edit-item" role="tab" aria-controls="nav-home" aria-selected="true">Edit item</a>             
+              </div>
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+              <%- include('edit_item.ejs') %>
+            </div>
+        <% } %>
       </div>
       <!-- /.container-fluid -->
 
@@ -65,3 +97,11 @@
 
 
 <%- include('../../partials/js.ejs') -%>
+
+<script>
+  ClassicEditor
+      .create( document.querySelector( '#desc' ) )
+      .catch( error => {
+          console.error( error );
+      } );
+</script>
