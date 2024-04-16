@@ -2,6 +2,7 @@ const Category = require('../models/Category');
 const Bank = require('../models/Bank');
 const Item = require('../models/Item');
 const Image = require('../models/Image');
+const Featured = require('../models/Feature');
 const fs = require('fs-extra');
 const path = require('path');
 const { error } = require('console');
@@ -342,6 +343,7 @@ module.exports = {
         }
     },
 
+
     deleteItem: async (req, res) => {
         try {
             const { id } = req.params;
@@ -375,11 +377,71 @@ module.exports = {
             res.redirect('/admin/item');
         }
     },
+    
+    viewDetailItem: async (req, res) => {
+        const { itemId } = req.params;
+        
+        try {
+            const item = await Featured.find({ itemId: itemId });
+
+            const alertMessage = req.flash('alertMessage');
+            const alertStatus = req.flash('alertStatus');
+            const alert = { message: alertMessage, status: alertStatus};
+            
+            res.render('admin/item/detail/view_detail', {
+                title: 'Dreamland | Detail Item',
+                alert,
+                item,
+                itemId
+            });
+        } catch (error) {
+            req.flash('alertMessage', `${error.message}`);
+            req.flash('alertStatus', 'danger');
+            res.redirect(`admin/item/detail/view_detail/${itemId}`);
+            
+        }
+
+    },
+
+    addFeatured: async (req, res) => {
+        try {
+            const {name, qty, itemId} = req.body;
+
+            if (!req.file) {
+                req.flash('alertMessage', `Image not found`);
+                req.flash('alertStatus', 'danger');
+                res.redirect(`admin/item/detail/view_detail/${itemId}`);
+            }
+
+            const featured = await Featured.create({
+                name,
+                qty,
+                itemId,
+                imageUrl : `images/${req.file.filename}`
+            });
+
+            const item = await Item.findOne({ _id : itemId });
+            item.featureId.push({ _id : featured.id });
+            await item.save();
+
+            req.flash('alertMessage', 'Success add Featured');
+            req.flash('alertStatus', 'success');
+            res.redirect(`admin/item/detail/view_detail/${itemId}`);
+        } catch (error) {
+            req.flash('alertMessage', `${error.message}`);
+            req.flash('alertStatus', 'danger');
+            res.redirect(`admin/item/detail/view_detail/${itemId}`);
+            
+        }
+    },
 
 
     viewBooking: (req, res) => {
         res.render('admin/booking/view_booking', {
             title: 'Dreamland | Booking'
         });
-    },
+    }
+
+
+    
 }
