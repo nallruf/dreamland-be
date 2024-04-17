@@ -397,20 +397,20 @@ module.exports = {
         } catch (error) {
             req.flash('alertMessage', `${error.message}`);
             req.flash('alertStatus', 'danger');
-            res.redirect(`admin/item/detail/view_detail/${itemId}`);
+            res.redirect(`/admin/item/detail/view_detail/${itemId}`);
             
         }
 
     },
 
     addFeatured: async (req, res) => {
+        const {name, qty, itemId} = req.body;
         try {
-            const {name, qty, itemId} = req.body;
 
             if (!req.file) {
                 req.flash('alertMessage', `Image not found`);
                 req.flash('alertStatus', 'danger');
-                res.redirect(`admin/item/detail/view_detail/${itemId}`);
+                res.redirect(`/admin/item/detail-item/${itemId}`);
             }
 
             const featured = await Featured.create({
@@ -426,12 +426,71 @@ module.exports = {
 
             req.flash('alertMessage', 'Success add Featured');
             req.flash('alertStatus', 'success');
-            res.redirect(`admin/item/detail/view_detail/${itemId}`);
+            res.redirect(`/admin/item/detail-item/${itemId}`);
         } catch (error) {
             req.flash('alertMessage', `${error.message}`);
             req.flash('alertStatus', 'danger');
-            res.redirect(`admin/item/detail/view_detail/${itemId}`);
+            res.redirect(`/admin/item/detail-item/${itemId}`);
             
+        }
+    },
+
+    editFeatured: async (req, res) => {
+        const { id, name, qty , itemId } = req.body;
+        try {
+            const featured = await Featured.findOne({ _id : id});
+            if (req.file == undefined){
+                featured.name = name;
+                featured.qty = qty;
+                await featured.save();
+                req.flash('alertMessage', 'Success update feature');
+                req.flash('alertStatus', 'success');
+                res.redirect(`/admin/item/detail-item/${itemId}`);
+            }else{
+                await fs.unlink(path.join(`public/${featured.imageUrl}`))
+                featured.name = name;
+                featured.nomerRekening = qty;
+                featured.imageUrl = `images/${req.file.filename}`
+                await featured.save();
+                req.flash('alertMessage', 'Success update feature');
+                req.flash('alertStatus', 'success');
+                res.redirect(`/admin/item/detail-item/${itemId}`);
+            }
+        } catch (error) {
+            req.flash('alertMessage', `${error.message}`);
+            req.flash('alertStatus', 'danger');
+            res.redirect(`/admin/item/detail-item/${itemId}`);  
+            
+        }
+    },
+
+    deleteFeature: async (req, res) => {
+        const {id, itemId} = req.params;
+
+        try {
+            const featured = await Featured.findOne({ _id : id });
+
+            const item = await Item.findOne({ _id : itemId }).populate('featureId');
+
+            for (let i = 0; i < item.featureId.length; i++) {
+                if (item.featureId[i]._id.toString() === featured._id.toString()) {
+                    item.featureId.pull({ _id : featured._id });
+                    await item.save();
+                }
+                              
+            }
+            await fs.unlink(path.join(`public/${featured.imageUrl}`));
+            await featured.deleteOne();
+
+            req.flash('alertMessage', 'Success delete feature');
+            req.flash('alertStatus', 'success');
+            res.redirect(`/admin/item/detail-item/${itemId}`);
+
+
+        } catch (error) {
+            req.flash('alertMessage', `${error.message}`);
+            req.flash('alertStatus', 'danger');
+            res.redirect(`/admin/item/detail-item/${itemId}`);  
         }
     },
 

@@ -24,6 +24,8 @@ routes.delete('/item/:id/delete', adminController.deleteItem);
 
 routes.get('/item/detail-item/:itemId', adminController.viewDetailItem);
 routes.post('/item/add/featured', upload, adminController.addFeatured);
+routes.put('/item/update/featured', upload, adminController.editFeatured);
+routes.delete('/item/:itemId/delete/:id', adminController.deleteFeature);
 
 routes.get('/booking', adminController.viewBooking);
 

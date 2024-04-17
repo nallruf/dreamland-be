@@ -78,6 +78,8 @@
 
 <%- include('../../../partials/js.ejs') -%>
 
+<%- include('./edit_featured_modal.ejs') -%>
+
 <script>
     $(document).ready(function () {
         $('#dataTableActivity').dataTable();
@@ -88,4 +90,15 @@
       .catch( error => {
           console.error( error );
       } );
+
+
+  $('#dataTable').on('click', '.button-update', function (){
+    let id = $(this).data('id');
+    let qty = $(this).data('qty');
+    let name = $(this).data('name');
+    $('#edit-modal').modal('show');
+    $('.id').val(id);
+    $('.qty').val(qty);
+    $('.name').val(name);
+  })
 </script>

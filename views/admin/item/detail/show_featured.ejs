@@ -57,11 +57,11 @@
                                     <img src="http://localhost:3000/<%= item[i].imageUrl %>" alt="imageUrl" height="70px">
                                   </td>
                                 <td>
-                                    <form action="/admin/item/<%= item[i].id %>/delete?_method=DELETE" method="POST">
-                                        <a href="/admin/item/<%= item[i].id %>" class="btn btn-warning btn-circle btn-sm"><i class="fas fa-edit"></i></a>
+                                    <form action="/admin/item/<%= itemId %>/delete/<%= item[i].id %>?_method=DELETE" method="POST">
+                                      <a href="javascript:void()" type="button" class="btn btn-warning btn-circle btn-sm button-update" data-id="<%= item[i].id %>" data-name="<%= item[i].name %>"    data-qty="<%= item[i].qty %>"><i class="fas fa-edit"></i></a>
                                         <button type="submit" href="" class="btn btn-danger btn-circle btn-sm"><i class="fas fa-trash"></i></button>
                                       </form>
-
+                                        
                                 </td>
 
                             </tr>
@@ -77,3 +77,5 @@
   </div>
   </div>
   
+
+ 
