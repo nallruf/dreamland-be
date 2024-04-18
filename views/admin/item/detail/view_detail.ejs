@@ -80,6 +80,8 @@
 
 <%- include('./edit_featured_modal.ejs') -%>
 
+<%- include('./edit_activity_modal.ejs') -%>
+
 <script>
     $(document).ready(function () {
         $('#dataTableActivity').dataTable();
@@ -99,6 +101,17 @@
     $('#edit-modal').modal('show');
     $('.id').val(id);
     $('.qty').val(qty);
+    $('.name').val(name);
+  })
+
+
+  $('#dataTableActivity').on('click', '.button-update', function (){
+    let id = $(this).data('id');
+    let type = $(this).data('type');
+    let name = $(this).data('name');
+    $('#edit-modal-activity').modal('show');
+    $('.id').val(id);
+    $('.type').val(type);
     $('.name').val(name);
   })
 </script>

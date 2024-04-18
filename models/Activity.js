@@ -12,7 +12,8 @@ const activitySchema = new mongoose.Schema({
     },
     isPopular: {
         type: Boolean,
-        required: true
+        required: true,
+        default: false
     },
     imageUrl: {
         type: String,

@@ -25,7 +25,12 @@ routes.delete('/item/:id/delete', adminController.deleteItem);
 routes.get('/item/detail-item/:itemId', adminController.viewDetailItem);
 routes.post('/item/add/featured', upload, adminController.addFeatured);
 routes.put('/item/update/featured', upload, adminController.editFeatured);
-routes.delete('/item/:itemId/delete/:id', adminController.deleteFeature);
+routes.delete('/item/:itemId/delete/feature/:id', adminController.deleteFeature);
+
+routes.post('/item/add/activity', upload, adminController.addActivity);
+routes.put('/item/update/activity', upload, adminController.editActivity);
+routes.delete('/item/:itemId/delete/activity/:id', adminController.deleteActivity);
+
 
 routes.get('/booking', adminController.viewBooking);
 
