@@ -8,6 +8,29 @@
     <div class="card shadow mb-4 mt-2">
         <div class="card-body">
                 <img src="http://localhost:3000/<%= item.imageId[x].imageUrl %>" alt="image" style="width: 100%; display: block;">
+
+                <form action="/admin/item/show-image/<%= id %>?_method=PUT" method="POST" enctype="multipart/form-data">
+
+                        <div class="form-group">
+                          <label for="name">Image</label>
+                          <input type="file" class="form-control image" id="image" name="image" >
+                          <span>Pilih gambar untuk update image</span>
+                        </div>
+                    <div class="modal-footer">
+                        <input type="hidden" class="id" name="idItem" value="<%= id %>">
+
+                        <input type="hidden" class="id" name="id" value="<%= item.imageId[x].id %>">
+                        <button type="Submit" class="btn btn-primary">Update</button>
+                    </div>
+                </form>
+
+                <form action="/admin/item/show-image/<%= id %>?_method=DELETE"  method="POST">
+
+                    <input type="hidden" class="id" name="idItem" value="<%= id %>">
+                    <input type="hidden" class="id" name="id" value="<%= item.imageId[x].id %>">
+                    <button type="Submit" class="btn btn-primary">Delete</button>
+
+                </form>
             </div>
         </div>
     </div>

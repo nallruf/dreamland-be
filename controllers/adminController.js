@@ -257,12 +257,61 @@ module.exports = {
                 title: 'Dreamland | Show Image Item',
                 alert,
                 item,
+                id,
                 action: 'show image'
             });
         } catch (error) {
             req.flash('alertMessage', `${error.message}`);
             req.flash('alertStatus', 'danger');
             res.redirect('/admin/item');
+            
+        }
+    },
+
+    editImageItem: async (req, res) => {
+            const { id, idItem } = req.body;
+
+            try {
+                const imageUpdate = await Image.findOne({ _id : id });
+                await fs.unlink(path.join(`public/${imageUpdate.imageUrl}`));
+                imageUpdate.imageUrl = `images/${req.file.filename}`;
+                await imageUpdate.save();
+
+                req.flash('alertMessage', 'Success update item');
+                req.flash('alertStatus', 'success');
+                res.redirect(`/admin/item/show-image/${idItem}`);
+
+            } catch (error) {
+                req.flash('alertMessage', `${error.message}`);
+                req.flash('alertStatus', 'danger');
+                res.redirect(`/admin/item/show-image/${idItem}`);
+            }
+
+    },
+
+    deleteImageItem: async (req, res) => {
+        const { idItem, id } = req.body;
+
+        try {
+            const item = await Item.findOne({ _id : idItem})
+                .populate({ path: 'imageId', select: 'id imageUrl' });
+            const image = await Image.findOne({ _id : id });
+
+            console.log(item)
+            item.imageId.pull({ _id : id});
+            await item.save();
+            await fs.unlink(path.join(`public/${image.imageUrl}`));
+            await image.deleteOne();
+
+            req.flash('alertMessage', 'Success delete item');
+            req.flash('alertStatus', 'success');
+            res.redirect(`/admin/item/show-image/${idItem}`);
+
+
+        } catch (error) {
+            req.flash('alertMessage', `${error.message}`);
+            req.flash('alertStatus', 'danger');
+            res.redirect(`/admin/item/show-image/${idItem}`);
             
         }
     },

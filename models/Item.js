@@ -23,6 +23,10 @@ const itemSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    unit: {
+        type: String,
+        default: 'night'
+    },
     price: {
         type: String,
         required: true

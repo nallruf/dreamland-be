@@ -17,6 +17,7 @@ var usersRouter = require('./routes/users');
 
 //router admin
 const adminRouter = require('./routes/admin')
+const apiRouter = require('./routes/api')
 
 
 var app = express();
@@ -41,11 +42,21 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/sb-admin-2', express.static(path.join(__dirname, 'node_modules/startbootstrap-sb-admin-2')));
 
 
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*'); // Ganti '*' dengan domain yang sesuai jika Anda ingin membatasi akses
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});
+
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 //admmin
 app.use('/admin', adminRouter);
+app.use('/api/v1/member', apiRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

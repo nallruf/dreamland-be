@@ -22,6 +22,10 @@ routes.get('/item/show-image/:id', adminController.showImageItem );
 routes.post('/item', uploadMultiple, adminController.addItem);
 routes.delete('/item/:id/delete', adminController.deleteItem);
 
+routes.put('/item/show-image/:id', upload, adminController.editImageItem );
+routes.delete('/item/show-image/:id', adminController.deleteImageItem );
+
+
 routes.get('/item/detail-item/:itemId', adminController.viewDetailItem);
 routes.post('/item/add/featured', upload, adminController.addFeatured);
 routes.put('/item/update/featured', upload, adminController.editFeatured);
